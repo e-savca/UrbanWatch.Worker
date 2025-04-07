@@ -1,11 +1,16 @@
 FROM mcr.microsoft.com/dotnet/runtime:8.0 AS base
+
+# link to repo
+LABEL org.opencontainers.image.source https://github.com/e-savca/UrbanWatch.Worker
+
 WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY . .
-RUN dotnet restore vssln/UrbanWatch.Worker.sln
-RUN dotnet publish vssln/UrbanWatch.Worker.sln -c Release -o /app/publish
+WORKDIR /src/vssln
+RUN dotnet restore
+RUN dotnet publish -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
