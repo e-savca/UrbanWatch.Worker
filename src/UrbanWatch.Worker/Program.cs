@@ -18,6 +18,7 @@ builder.Services.AddSingleton<MongoContext>();
 
 builder.Services.AddSingleton<TranzyClient>();
 builder.Services.AddSingleton<EnvManager>();
+builder.Services.AddSingleton<TimeWindowHelper>();
 
 builder.Services.AddSingleton<VehicleHistoryService>();
 

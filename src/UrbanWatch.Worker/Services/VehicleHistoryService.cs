@@ -20,7 +20,7 @@ public class VehicleHistoryService
             Vehicles = vehicles
         };
 
-        await _collection.InsertOneAsync(snapshot, cancellationToken: ct);
+         await _collection.InsertOneAsync(snapshot, cancellationToken: ct);
     }
 
     public async Task ClearAsync(CancellationToken ct)

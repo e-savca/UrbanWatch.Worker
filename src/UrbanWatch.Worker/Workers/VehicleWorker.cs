@@ -11,10 +11,17 @@ namespace UrbanWatch.Worker;
 public class VehicleWorker : BackgroundService
 {
     private const string AgencyId = "4";
+    private readonly TimeSpan startWindow = new TimeSpan(2, 10, 0);
+    private readonly TimeSpan endWindow = new TimeSpan(21, 30, 0);
+
+
     private readonly TranzyClient _client;
+
     public VehicleHistoryService VehicleHistoryService { get; }
+
     // public RedisContext RedisContext { get; }
     public EnvManager EnvManager { get; }
+    public TimeWindowHelper TimeWindowHelper { get; }
     private readonly ILogger<VehicleWorker> _logger;
 
     private readonly Dictionary<string, string> _vehiclesHashCache = new Dictionary<string, string>();
@@ -24,7 +31,8 @@ public class VehicleWorker : BackgroundService
         VehicleHistoryService vehicleHistoryService,
         // RedisContext redisContext,
         EnvManager envManager,
-        ILogger<VehicleWorker> logger)
+        ILogger<VehicleWorker> logger, 
+        TimeWindowHelper timeWindowHelper)
     {
         VehicleHistoryService = vehicleHistoryService;
         // RedisContext = redisContext;
@@ -32,24 +40,20 @@ public class VehicleWorker : BackgroundService
 
         _client = client;
         _logger = logger;
+        TimeWindowHelper = timeWindowHelper;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            if (_logger.IsEnabled(LogLevel.Information))
-            {
-                _logger.LogInformation("Vehicle worker running at: {time}", DateTimeOffset.Now);
-            }
-
             var vehicles = await _client.GetVehiclesAsync(AgencyId);
-            
+
             if (_vehiclesHashCache.Count != 0)
             {
                 var rnd = new Random();
                 var sample = vehicles.OrderBy(_ => rnd.Next()).Take(20).ToList();
-            
+
                 bool anyChanged = sample.Any(s =>
                 {
                     var currentHash = ComputeVehicleHash(s);
@@ -68,10 +72,9 @@ public class VehicleWorker : BackgroundService
                 await VehicleHistoryService.SaveBatchAsync(vehicles, stoppingToken);
             }
             
-            if (!EnvManager.IsDevelopment())
-                await Task.Delay(5000, stoppingToken);
-            else
-                await Task.Delay(10000, stoppingToken);
+            var delay = TimeWindowHelper.GetDelay(startWindow, endWindow);
+
+            await Task.Delay(delay, stoppingToken);
         }
     }
 

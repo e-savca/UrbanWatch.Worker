@@ -5,7 +5,14 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "environmentVariables": {
-        "DOTNET_ENVIRONMENT": "Development"
+        "DOTNET_ENVIRONMENT": "Development",
+        "TRANZY_API_KEY_DEV01": "",
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "MONGO__HOST": "localhost",
+        "MONGO__PORT": "27017",
+        "MONGO__DATABASE": "UrbanWatchDB",
+        "MONGO__USERNAME": "",
+        "MONGO__PASSWORD": ""
       }
     }
   }

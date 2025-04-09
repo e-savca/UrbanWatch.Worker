@@ -402,3 +402,4 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
+src/UrbanWatch.Worker/Properties/launchSettings.dev.json
