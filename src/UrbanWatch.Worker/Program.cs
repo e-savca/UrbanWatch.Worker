@@ -3,10 +3,12 @@ using UrbanWatch.Worker.Clients;
 using UrbanWatch.Worker.ConfigManager;
 using UrbanWatch.Worker.Infrastructure.Data;
 using UrbanWatch.Worker.Services;
+using UrbanWatch.Worker.Workers;
 
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddHttpClient();
-builder.Services.AddHostedService<VehicleWorker>();
+builder.Services.AddHostedService<FetchVehiclesWorker>();
+builder.Services.AddHostedService<CleanupVehiclesLive>();
 
 // bind env vars
 builder.Services.Configure<MongoSettings>(

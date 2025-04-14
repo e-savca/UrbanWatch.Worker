@@ -2,13 +2,12 @@ using System.Security.Cryptography;
 using System.Text;
 using UrbanWatch.Worker.Clients;
 using UrbanWatch.Worker.ConfigManager;
-using UrbanWatch.Worker.Infrastructure.Data;
 using UrbanWatch.Worker.Models;
 using UrbanWatch.Worker.Services;
 
-namespace UrbanWatch.Worker;
+namespace UrbanWatch.Worker.Workers;
 
-public class VehicleWorker : BackgroundService
+public class FetchVehiclesWorker : BackgroundService
 {
     private const string AgencyId = "4";
     private readonly TimeSpan startWindow = new TimeSpan(2, 10, 0);
@@ -22,16 +21,16 @@ public class VehicleWorker : BackgroundService
     // public RedisContext RedisContext { get; }
     public EnvManager EnvManager { get; }
     public TimeWindowHelper TimeWindowHelper { get; }
-    private readonly ILogger<VehicleWorker> _logger;
+    private readonly ILogger<FetchVehiclesWorker> _logger;
 
     private readonly Dictionary<string, string> _vehiclesHashCache = new Dictionary<string, string>();
 
-    public VehicleWorker(
+    public FetchVehiclesWorker(
         TranzyClient client,
         VehicleHistoryService vehicleHistoryService,
         // RedisContext redisContext,
         EnvManager envManager,
-        ILogger<VehicleWorker> logger, 
+        ILogger<FetchVehiclesWorker> logger, 
         TimeWindowHelper timeWindowHelper)
     {
         VehicleHistoryService = vehicleHistoryService;
