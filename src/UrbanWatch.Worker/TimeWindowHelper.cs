@@ -1,10 +1,11 @@
 using UrbanWatch.Worker.ConfigManager;
+using UrbanWatch.Worker.Interfaces;
 
 namespace UrbanWatch.Worker;
 
-public class TimeWindowHelper(EnvManager envManager)
+public class TimeWindowHelper(IEnvManager envManager)
 {
-    private EnvManager EnvManager { get; } = envManager;
+    private IEnvManager EnvManager { get; } = envManager;
     
     public TimeSpan GetDelay(TimeSpan startWindow, TimeSpan endWindow)
     {
@@ -40,6 +41,28 @@ public class TimeWindowHelper(EnvManager envManager)
             ? TimeSpan.FromMilliseconds(30000)
             : TimeSpan.FromMicroseconds(5000);
     }
+
+    public TimeSpan GetDelay(params TimeSpan[] times)
+    {
+        var now = DateTime.UtcNow.TimeOfDay;
+
+        var delays = times
+            .Select(t => t - now)
+            .Where(d => d >= TimeSpan.Zero)
+            .ToList();
+
+        if (delays.Any())
+        {
+            return delays.Min();
+        }
+        else
+        {
+            var firstTomorrow = times.Min();
+            var delayUntilTomorrow = (TimeSpan.FromHours(24) - now) + firstTomorrow;
+            return delayUntilTomorrow;
+        }
+    }
+
 
     private bool IsInWindow(TimeSpan startWindow, TimeSpan endWindow)
     {

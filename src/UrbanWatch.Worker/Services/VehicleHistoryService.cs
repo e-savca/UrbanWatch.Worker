@@ -1,6 +1,6 @@
 using MongoDB.Driver;
+using UrbanWatch.Worker.Documents;
 using UrbanWatch.Worker.Infrastructure.Data;
-using UrbanWatch.Worker.Models;
 
 namespace UrbanWatch.Worker.Services;
 
@@ -20,12 +20,20 @@ public class VehicleHistoryService
             Vehicles = vehicles
         };
 
-         await _collection.InsertOneAsync(snapshot, cancellationToken: ct);
+        await _collection.InsertOneAsync(snapshot, cancellationToken: ct);
     }
 
     public async Task ClearAsync(CancellationToken ct)
     {
         await _collection.DeleteManyAsync(FilterDefinition<VehicleSnapshot>.Empty, cancellationToken: ct);
     }
+
+    public async Task ClearAsync(TimeSpan timeSpan, CancellationToken ct)
+    {
+        var threshold = DateTime.UtcNow - timeSpan;
+        var filter = Builders<VehicleSnapshot>.Filter.Lt(x => x.Timestamp, threshold);
+        await _collection.DeleteManyAsync(filter, cancellationToken: ct);
+    }
+
 
 }

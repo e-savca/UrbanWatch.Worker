@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace UrbanWatch.Worker.Models;
+namespace UrbanWatch.Worker.Documents;
 
 public class Vehicle
 {
