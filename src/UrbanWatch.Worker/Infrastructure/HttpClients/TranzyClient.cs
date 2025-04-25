@@ -19,19 +19,19 @@ public class TranzyClient(
 
         try
         {
-            using var response = await client.SendAsync(request);
+            var response = await SendRequestAsync(client, request, logger);
+
             if (response.StatusCode == HttpStatusCode.TooManyRequests)
             {
                 logger.LogWarning("Status Code 429: Too Many Requests");
-                bool switched = EnvManager.TranzyApiKeyManager.TrySwitchKey();
 
+                bool switched = EnvManager.TranzyApiKeyManager.TrySwitchKey();
                 if (!switched)
                     throw new Exception("All API keys exceeded quota.");
+                
+                var retryRequest = CloneRequestWithNewApiKey(request, EnvManager.TranzyApiKeyManager.GetCurrentKey());
 
-                request.Headers.Remove("X-API-KEY");
-                request.Headers.Add("X-API-KEY", EnvManager.TranzyApiKeyManager.GetCurrentKey());
-
-                using var retryResponse = await client.SendAsync(request);
+                var retryResponse = await SendRequestAsync(client, retryRequest, logger);
                 retryResponse.EnsureSuccessStatusCode();
                 var retryBody = await retryResponse.Content.ReadAsStringAsync();
                 return JsonConvert.DeserializeObject<List<T>>(retryBody) ?? new List<T>();
@@ -50,6 +50,31 @@ public class TranzyClient(
         }
     }
 
+    private async Task<HttpResponseMessage> SendRequestAsync(HttpClient client, HttpRequestMessage request, ILogger logger)
+    {
+        var response = await client.SendAsync(request);
+        logger.LogInformation($"Received status code: {(int)response.StatusCode} ({response.StatusCode})");
+        return response;
+    }
+
+    private HttpRequestMessage CloneRequestWithNewApiKey(HttpRequestMessage originalRequest, string newApiKey)
+    {
+        var clone = new HttpRequestMessage(originalRequest.Method, originalRequest.RequestUri)
+        {
+            Content = originalRequest.Content,
+            Version = originalRequest.Version
+        };
+
+        foreach (var header in originalRequest.Headers)
+        {
+            clone.Headers.TryAddWithoutValidation(header.Key, header.Value);
+        }
+
+        clone.Headers.Remove("X-API-KEY");
+        clone.Headers.Add("X-API-KEY", newApiKey);
+
+        return clone;
+    }
 
     public async Task<List<Vehicle>> GetVehiclesAsync(string agencyId)
     {

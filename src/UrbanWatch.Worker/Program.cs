@@ -30,7 +30,6 @@ builder.Services.AddSingleton<TimeWindowHelper>();
 builder.Services.AddSingleton<VehicleHistoryService>();
 builder.Services.AddSingleton<MongoCollectionService>();
 builder.Services.AddSingleton<CacheService>();
-builder.Services.AddSingleton<CacheChangeListener>();
 
 var host = builder.Build();
 host.Run();
