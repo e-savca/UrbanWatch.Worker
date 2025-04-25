@@ -2,8 +2,6 @@ using System;
 using System.Linq;
 using JetBrains.Annotations;
 using Moq;
-using UrbanWatch.Worker;
-using UrbanWatch.Worker.ConfigManager;
 using UrbanWatch.Worker.Interfaces;
 using Xunit;
 
@@ -25,6 +23,7 @@ public class TimeWindowHelperTest
 public void GetDelay_SingleFutureTime_ReturnsCorrectDelay()
 {
     var now = DateTime.UtcNow.TimeOfDay;
+    var today = DateTime.UtcNow.Date;
     var futureTime = now + TimeSpan.FromMinutes(10);
     var expected = TimeSpan.FromMinutes(10).TotalMinutes;
 
@@ -38,11 +37,10 @@ public void GetDelay_SingleFutureTime_ReturnsCorrectDelay()
 public void GetDelay_SinglePastTime_ReturnsDelayForTomorrow()
 {
     var now = DateTime.UtcNow.TimeOfDay;
-    var pastTime = now - TimeSpan.FromMinutes(10); // deja trecut azi
+    var pastTime = now - TimeSpan.FromMinutes(10); 
 
     var delay = timeWindowHelper.GetDelay(pastTime);
-
-    // Delay-ul ar trebui să fie timpul rămas din zi + pastTime de mâine
+    
     var expectedDelay = (TimeSpan.FromHours(24) - now) + pastTime;
 
     Assert.True(Math.Abs((delay - expectedDelay).TotalMinutes) <= 0.1);
@@ -57,9 +55,9 @@ public void GetDelay_MultipleTimes_ReturnsMinimumValidDelay()
 
     var times = new[]
     {
-        now - TimeSpan.FromMinutes(5),  // trecut azi
-        now + TimeSpan.FromMinutes(15), // viitor azi
-        now + TimeSpan.FromMinutes(5),  // cel mai mic valid
+        now - TimeSpan.FromMinutes(5), 
+        now + TimeSpan.FromMinutes(15),
+        now + TimeSpan.FromMinutes(5), 
         now + TimeSpan.FromMinutes(30)
     };
 
