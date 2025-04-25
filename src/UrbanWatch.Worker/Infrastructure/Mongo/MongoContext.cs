@@ -1,8 +1,9 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using UrbanWatch.Worker.Documents;
+using UrbanWatch.Worker.ConfigManager;
+using UrbanWatch.Worker.Infrastructure.Mongo.Documents;
 
-namespace UrbanWatch.Worker.Infrastructure.Data;
+namespace UrbanWatch.Worker.Infrastructure.Mongo;
 
 public class MongoContext
 {

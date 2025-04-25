@@ -1,4 +1,4 @@
-using UrbanWatch.Worker.Clients;
+using UrbanWatch.Worker.Infrastructure.HttpClients;
 using UrbanWatch.Worker.Services;
 
 namespace UrbanWatch.Worker.Workers;

@@ -1,4 +1,4 @@
-namespace UrbanWatch.Worker;
+namespace UrbanWatch.Worker.ConfigManager;
 
 public class MongoSettings
 {

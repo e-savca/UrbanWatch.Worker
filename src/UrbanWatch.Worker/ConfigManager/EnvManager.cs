@@ -3,20 +3,13 @@ using UrbanWatch.Worker.Interfaces;
 
 namespace UrbanWatch.Worker.ConfigManager;
 
-public class EnvManager : IEnvManager
+public class EnvManager(
+    TranzyApiKeyManager tranzyApiKeyManager,
+    IConfiguration config
+    ) : IEnvManager
 {
-    public TranzyApiKeyManager TranzyApiKeyManager { get; }
+    public TranzyApiKeyManager TranzyApiKeyManager { get; } = tranzyApiKeyManager;
 
-    private IConfiguration Config { get; }
-
-    public EnvManager(
-        IConfiguration config
-    )
-    {
-        TranzyApiKeyManager = new TranzyApiKeyManager(config);
-        Config = config;
-    }
-    
-    public bool IsDevelopment() => Config["ASPNETCORE_ENVIRONMENT"] == "Development";
+    public bool IsDevelopment() => config["ASPNETCORE_ENVIRONMENT"] == "Development";
 
 }

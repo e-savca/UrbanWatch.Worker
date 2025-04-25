@@ -1,7 +1,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace UrbanWatch.Worker.Documents;
+namespace UrbanWatch.Worker.Infrastructure.Mongo.Documents;
 
 public class VehicleSnapshot
 {

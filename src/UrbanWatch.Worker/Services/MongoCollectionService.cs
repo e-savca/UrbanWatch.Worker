@@ -1,7 +1,7 @@
 using System;
 using MongoDB.Driver;
-using UrbanWatch.Worker.Documents;
-using UrbanWatch.Worker.Infrastructure.Data;
+using UrbanWatch.Worker.Infrastructure.Mongo;
+using UrbanWatch.Worker.Infrastructure.Mongo.Documents;
 
 namespace UrbanWatch.Worker.Services;
 

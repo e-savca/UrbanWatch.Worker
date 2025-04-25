@@ -8,11 +8,12 @@
         "DOTNET_ENVIRONMENT": "Development",
         "TRANZY_API_KEY_DEV01": "",
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "MONGO__HOST": "localhost",
+        "MONGO__HOST": "192.168.0.63",
         "MONGO__PORT": "27017",
-        "MONGO__DATABASE": "UrbanWatchDB",
+        "MONGO__DATABASE": "",
         "MONGO__USERNAME": "",
-        "MONGO__PASSWORD": ""
+        "MONGO__PASSWORD": "",
+        "REDIS_CONNECTION_STRING" : "192.168.0.63:6379"
       }
     }
   }

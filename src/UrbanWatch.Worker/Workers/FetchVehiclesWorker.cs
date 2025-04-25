@@ -1,8 +1,8 @@
 using System.Security.Cryptography;
 using System.Text;
-using UrbanWatch.Worker.Clients;
 using UrbanWatch.Worker.ConfigManager;
-using UrbanWatch.Worker.Documents;
+using UrbanWatch.Worker.Infrastructure.HttpClients;
+using UrbanWatch.Worker.Infrastructure.Mongo.Documents;
 using UrbanWatch.Worker.Interfaces;
 using UrbanWatch.Worker.Services;
 
@@ -10,9 +10,8 @@ namespace UrbanWatch.Worker.Workers;
 
 public class FetchVehiclesWorker(
     TranzyClient client,
-    // RedisContext redisContext,
+    CacheService cacheService,
     VehicleHistoryService vehicleHistoryService,
-    IEnvManager envManager,
     ILogger<FetchVehiclesWorker> logger,
     TimeWindowHelper timeWindowHelper
     ) : BackgroundService
@@ -46,14 +45,28 @@ public class FetchVehiclesWorker(
                 });
                 if (anyChanged)
                 {
-                    await vehicleHistoryService.SaveBatchAsync(vehicles, stoppingToken);
+                    var tasks = new[]
+                    {
+                        vehicleHistoryService.SaveBatchAsync(vehicles, stoppingToken),
+                        cacheService.CacheVehiclesAsync(vehicles)
+                    };
+                    
+                    await Task.WhenAll(tasks);
+
                     AddOrUpdateVehiclesHash(vehicles);
                 }
             }
             else
             {
+                var tasks = new[]
+                {
+                    vehicleHistoryService.SaveBatchAsync(vehicles, stoppingToken),
+                    cacheService.CacheVehiclesAsync(vehicles)
+                };
+                    
+                await Task.WhenAll(tasks);
+                
                 AddOrUpdateVehiclesHash(vehicles);
-                await vehicleHistoryService.SaveBatchAsync(vehicles, stoppingToken);
             }
             
             var delay = TimeWindowHelper.GetDelay(_startWindow, _endWindow);

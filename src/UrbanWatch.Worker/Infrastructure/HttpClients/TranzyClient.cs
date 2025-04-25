@@ -1,64 +1,51 @@
 using System.Net;
 using Newtonsoft.Json;
-using System.Collections.Generic;
-using UrbanWatch.Worker.ConfigManager;
-using UrbanWatch.Worker.Documents;
+using UrbanWatch.Worker.Infrastructure.Mongo.Documents;
 using UrbanWatch.Worker.Interfaces;
 
-namespace UrbanWatch.Worker.Clients;
+namespace UrbanWatch.Worker.Infrastructure.HttpClients;
 
-public class TranzyClient
+public class TranzyClient(
+    IEnvManager envManager,
+    IHttpClientFactory factory,
+    ILogger<TranzyClient> logger
+    )
 {
-    public IEnvManager EnvManager { get; }
-    private readonly IHttpClientFactory _factory;
+    private IEnvManager EnvManager { get; } = envManager;
 
-    private readonly ILogger<TranzyClient> _logger;
-
-    public TranzyClient(
-        IEnvManager envManager,
-        IHttpClientFactory factory,
-        ILogger<TranzyClient> logger)
+    private async Task<List<T>> GetGenericAsync<T>(HttpRequestMessage request)
     {
-        EnvManager = envManager;
-        _factory = factory;
-        _logger = logger;
-    }
-
-    public async Task<List<T>> GetGenericAsync<T>(HttpRequestMessage request)
-    {
-        using var client = _factory.CreateClient();
+        using var client = factory.CreateClient();
 
         try
         {
-            using (var response = await client.SendAsync(request))
+            using var response = await client.SendAsync(request);
+            if (response.StatusCode == HttpStatusCode.TooManyRequests)
             {
-                if (response.StatusCode == HttpStatusCode.TooManyRequests)
-                {
-                    _logger.LogWarning("Status Code 429: Too Many Requests");
-                    bool switched = EnvManager.TranzyApiKeyManager.TrySwitchKey();
+                logger.LogWarning("Status Code 429: Too Many Requests");
+                bool switched = EnvManager.TranzyApiKeyManager.TrySwitchKey();
 
-                    if (!switched)
-                        throw new Exception("All API keys exceeded quota.");
+                if (!switched)
+                    throw new Exception("All API keys exceeded quota.");
 
-                    request.Headers.Remove("X-API-KEY");
-                    request.Headers.Add("X-API-KEY", EnvManager.TranzyApiKeyManager.GetCurrentKey());
+                request.Headers.Remove("X-API-KEY");
+                request.Headers.Add("X-API-KEY", EnvManager.TranzyApiKeyManager.GetCurrentKey());
 
-                    using var retryResponse = await client.SendAsync(request);
-                    retryResponse.EnsureSuccessStatusCode();
-                    var retryBody = await retryResponse.Content.ReadAsStringAsync();
-                    return JsonConvert.DeserializeObject<List<T>>(retryBody) ?? new List<T>();
-                }
-                else
-                {
-                    response.EnsureSuccessStatusCode();
-                    var body = await response.Content.ReadAsStringAsync();
-                    return JsonConvert.DeserializeObject<List<T>>(body) ?? new List<T>();
-                }
+                using var retryResponse = await client.SendAsync(request);
+                retryResponse.EnsureSuccessStatusCode();
+                var retryBody = await retryResponse.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<List<T>>(retryBody) ?? new List<T>();
+            }
+            else
+            {
+                response.EnsureSuccessStatusCode();
+                var body = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<List<T>>(body) ?? new List<T>();
             }
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error while calling API.");
+            logger.LogError(e, "Error while calling API.");
             throw;
         }
     }

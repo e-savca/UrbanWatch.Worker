@@ -1,7 +1,8 @@
 using UrbanWatch.Worker;
-using UrbanWatch.Worker.Clients;
 using UrbanWatch.Worker.ConfigManager;
-using UrbanWatch.Worker.Infrastructure.Data;
+using UrbanWatch.Worker.Infrastructure.HttpClients;
+using UrbanWatch.Worker.Infrastructure.Mongo;
+using UrbanWatch.Worker.Infrastructure.Redis;
 using UrbanWatch.Worker.Interfaces;
 using UrbanWatch.Worker.Services;
 using UrbanWatch.Worker.Workers;
@@ -17,8 +18,10 @@ builder.Services.Configure<MongoSettings>(
     builder.Configuration.GetSection("Mongo"));
 
 // Register dependencies
+builder.Services.AddTransient<TranzyApiKeyManager>();
+
 builder.Services.AddSingleton<MongoContext>();
-// builder.Services.AddSingleton(new RedisContext("redis:6379"));
+builder.Services.AddSingleton<RedisContext>();
 
 builder.Services.AddSingleton<TranzyClient>();
 builder.Services.AddSingleton<IEnvManager, EnvManager>();
@@ -26,6 +29,8 @@ builder.Services.AddSingleton<TimeWindowHelper>();
 
 builder.Services.AddSingleton<VehicleHistoryService>();
 builder.Services.AddSingleton<MongoCollectionService>();
+builder.Services.AddSingleton<CacheService>();
+builder.Services.AddSingleton<CacheChangeListener>();
 
 var host = builder.Build();
 host.Run();
