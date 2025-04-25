@@ -1,6 +1,4 @@
-using UrbanWatch.Worker.ConfigManager;
 using UrbanWatch.Worker.Interfaces;
-using ZstdSharp;
 
 namespace UrbanWatch.Worker;
 
@@ -39,8 +37,8 @@ public class TimeWindowHelper(IEnvManager envManager)
         }
         
         return EnvManager.IsDevelopment()
-            ? TimeSpan.FromMilliseconds(30000)
-            : TimeSpan.FromMicroseconds(5000);
+            ? TimeSpan.FromSeconds(30)
+            : TimeSpan.FromSeconds(5);
     }
 
     /// <summary>

@@ -28,51 +28,87 @@ public class FetchVehiclesWorker(
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        _logger.LogInformation("FetchVehiclesWorker started.");
+
         while (!stoppingToken.IsCancellationRequested)
         {
+            _logger.LogInformation("Fetching vehicles for AgencyId: {AgencyId}", AgencyId);
+
             var vehicles = await client.GetVehiclesAsync(AgencyId);
+            _logger.LogInformation("Fetched {Count} vehicles.", vehicles.Count);
 
             if (_vehiclesHashCache.Count != 0)
             {
+                _logger.LogInformation("Checking for changes in vehicle data...");
+
                 var rnd = new Random();
                 var sample = vehicles.OrderBy(_ => rnd.Next()).Take(20).ToList();
 
                 bool anyChanged = sample.Any(s =>
                 {
                     var currentHash = ComputeVehicleHash(s);
-                    if (s.VehicleId == null) return false;
-                    return !_vehiclesHashCache.TryGetValue(s.VehicleId, out var hash) || hash != currentHash;
+                    if (s.VehicleId == null)
+                    {
+                        _logger.LogWarning("Vehicle with null VehicleId found in sample.");
+                        return false;
+                    }
+
+                    var exists = _vehiclesHashCache.TryGetValue(s.VehicleId, out var hash);
+                    var changed = !exists || hash != currentHash;
+
+                    if (changed)
+                    {
+                        _logger.LogInformation("Change detected for VehicleId: {VehicleId}", s.VehicleId);
+                    }
+
+                    return changed;
                 });
+
                 if (anyChanged)
                 {
+                    _logger.LogInformation("Changes detected, saving batch and updating cache...");
+
                     var tasks = new[]
                     {
-                        vehicleHistoryService.SaveBatchAsync(vehicles, stoppingToken),
-                        cacheService.CacheVehiclesAsync(vehicles)
-                    };
-                    
+                    vehicleHistoryService.SaveBatchAsync(vehicles, stoppingToken),
+                    cacheService.CacheVehiclesAsync(vehicles)
+                };
+
                     await Task.WhenAll(tasks);
 
+                    _logger.LogInformation("Batch saved and cache updated.");
                     AddOrUpdateVehiclesHash(vehicles);
+                    _logger.LogInformation("Vehicle hashes updated.");
+                }
+                else
+                {
+                    _logger.LogInformation("No changes detected in the sampled vehicles.");
                 }
             }
             else
             {
+                _logger.LogInformation("First run: saving initial batch and caching vehicles...");
+
                 var tasks = new[]
                 {
-                    vehicleHistoryService.SaveBatchAsync(vehicles, stoppingToken),
-                    cacheService.CacheVehiclesAsync(vehicles)
-                };
-                    
+                vehicleHistoryService.SaveBatchAsync(vehicles, stoppingToken),
+                cacheService.CacheVehiclesAsync(vehicles)
+            };
+
                 await Task.WhenAll(tasks);
-                
+
+                _logger.LogInformation("Initial batch saved and cache initialized.");
                 AddOrUpdateVehiclesHash(vehicles);
+                _logger.LogInformation("Initial vehicle hashes stored.");
             }
-            
+
             var delay = TimeWindowHelper.GetDelay(_startWindow, _endWindow);
+            _logger.LogInformation("Delaying for {Delay} before next fetch cycle.", delay);
 
             await Task.Delay(delay, stoppingToken);
         }
+
+        _logger.LogInformation("FetchVehiclesWorker is stopping.");
     }
 
     private void AddOrUpdateVehiclesHash(List<Vehicle> vehicles)
@@ -80,7 +116,11 @@ public class FetchVehiclesWorker(
         foreach (var v in vehicles)
         {
             if (!string.IsNullOrWhiteSpace(v.VehicleId))
-                _vehiclesHashCache[v.VehicleId] = ComputeVehicleHash(v);
+            {
+                var hash = ComputeVehicleHash(v);
+                _vehiclesHashCache[v.VehicleId] = hash;
+                _logger.LogDebug("Updated hash for VehicleId: {VehicleId}", v.VehicleId);
+            }
         }
     }
 
@@ -89,6 +129,11 @@ public class FetchVehiclesWorker(
         var input = $"{vehicle.Latitude}_{vehicle.Longitude}_{vehicle.Timestamp}";
         using var sha256 = SHA256.Create();
         var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
-        return Convert.ToBase64String(bytes);
+        var result = Convert.ToBase64String(bytes);
+
+        _logger.LogDebug("Computed hash for VehicleId: {VehicleId}: {Hash}", vehicle.VehicleId, result);
+
+        return result;
     }
+
 }
