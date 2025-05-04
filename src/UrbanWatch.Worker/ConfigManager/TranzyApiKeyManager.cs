@@ -31,7 +31,7 @@ public class TranzyApiKeyManager
         
     }
 
-    private bool IsDevelopment() => _config["ASPNETCORE_ENVIRONMENT"] == "Development";
+    private bool IsDevelopment() => _config["DOTNET_ENVIRONMENT"] == "Development";
     
     public string GetCurrentKey() => _apiKeys[_currentKeyIndex];
 

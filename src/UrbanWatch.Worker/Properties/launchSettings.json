@@ -6,8 +6,10 @@
       "dotnetRunMessages": true,
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development",
-        "ASPNETCORE_ENVIRONMENT": "Development",
-
+        "INFISICAL_TOKEN": "",
+        "INFISICAL_WORKSPACE_ID": "",
+        "INFISICAL_ENVIRONMENT": "prod",
+        "INFISICAL_URL": "http://vault.home"
       }
     }
   }

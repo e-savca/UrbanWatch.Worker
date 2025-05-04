@@ -1,5 +1,6 @@
 using UrbanWatch.Worker;
 using UrbanWatch.Worker.ConfigManager;
+using UrbanWatch.Worker.Configuration;
 using UrbanWatch.Worker.Infrastructure.HttpClients;
 using UrbanWatch.Worker.Infrastructure.Mongo;
 using UrbanWatch.Worker.Infrastructure.Redis;
@@ -8,6 +9,15 @@ using UrbanWatch.Worker.Services;
 using UrbanWatch.Worker.Workers;
 
 var builder = Host.CreateApplicationBuilder(args);
+
+builder.Configuration.AddInfisical(
+    token:       builder.Configuration["INFISICAL_TOKEN"] ?? throw new InvalidOperationException("INFISICAL_TOKEN missing"),
+    workspaceId: builder.Configuration["INFISICAL_WORKSPACE_ID"] ?? throw new InvalidOperationException("INFISICAL_WORKSPACE_ID missing"),
+    environment: builder.Configuration["INFISICAL_ENVIRONMENT"] ?? "prod",
+    folder:      "/",
+    baseUrl:     builder.Configuration["INFISICAL_URL"] ?? "http://vault.home"
+);
+
 builder.Services.AddHttpClient();
 builder.Services.AddHostedService<FetchVehiclesWorker>();
 builder.Services.AddHostedService<CleanupVehiclesLive>();

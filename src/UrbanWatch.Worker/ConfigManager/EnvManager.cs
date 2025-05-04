@@ -10,6 +10,6 @@ public class EnvManager(
 {
     public TranzyApiKeyManager TranzyApiKeyManager { get; } = tranzyApiKeyManager;
 
-    public bool IsDevelopment() => config["ASPNETCORE_ENVIRONMENT"] == "Development";
+    public bool IsDevelopment() => config["DOTNET_ENVIRONMENT"] == "Development";
 
 }
