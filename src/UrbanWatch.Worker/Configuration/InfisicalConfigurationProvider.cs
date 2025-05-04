@@ -48,13 +48,17 @@ public class InfisicalConfigurationProvider : ConfigurationProvider
                 resp.EnsureSuccessStatusCode();
 
                 var body = resp.Content.ReadAsStringAsync();
-                var payload = JsonSerializer.Deserialize<InfisicalResponse>(body);
-                Data = payload.secrets.ToDictionary(s => s.secretKey, s => s.secretValue);
+                
+                var responseBody = resp.Content.ReadAsStringAsync()
+                    .GetAwaiter()
+                    .GetResult();
+                
+                var payload = JsonConvert.DeserializeObject<InfisicalResponse>(responseBody) ?? throw new InvalidOperationException("Empty payload");
+                Data = payload.secrets.ToDictionary(s => s.secretKey, s => s.secretValue); 
                 return;
             }
             catch (Exception ex) when (attempt < 3)
             {
-                // retry on next loop
                 Thread.Sleep(500 * attempt);
             }
         }

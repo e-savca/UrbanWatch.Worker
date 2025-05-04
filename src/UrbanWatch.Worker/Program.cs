@@ -23,9 +23,15 @@ builder.Services.AddHostedService<FetchVehiclesWorker>();
 builder.Services.AddHostedService<CleanupVehiclesLive>();
 builder.Services.AddHostedService<PullTranzyData>();
 
-// bind env vars
-builder.Services.Configure<MongoSettings>(
-    builder.Configuration.GetSection("Mongo"));
+// bind env vars for MongoSetting
+builder.Services.Configure<MongoSettings>(options =>
+{
+    options.Host     = builder.Configuration["MONGO_HOST"]     ?? throw new Exception("MONGO_HOST missing");
+    options.Port     = int.Parse(builder.Configuration["MONGO_PORT"] ?? "0");
+    options.Database = builder.Configuration["MONGO_DATABASE"] ?? throw new Exception("MONGO_DATABASE missing");
+    options.Username = builder.Configuration["MONGO_USERNAME"] ?? throw new Exception("MONGO_USERNAME missing");
+    options.Password = builder.Configuration["MONGO_PASSWORD"] ?? throw new Exception("MONGO_PASSWORD missing");
+});
 
 // Register dependencies
 builder.Services.AddTransient<TranzyApiKeyManager>();

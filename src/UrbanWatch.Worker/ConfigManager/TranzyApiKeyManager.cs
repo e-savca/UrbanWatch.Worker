@@ -2,10 +2,9 @@ namespace UrbanWatch.Worker.ConfigManager;
 
 public class TranzyApiKeyManager
 {
-    private const string TRANZY_API_KEY_DEV01 = "TRANZY_API_KEY_DEV01";
-    private const string TRANZY_API_KEY_PROD01 = "TRANZY_API_KEY_PROD01";
-    private const string TRANZY_API_KEY_PROD02 = "TRANZY_API_KEY_PROD02";
-    private const string TRANZY_API_KEY_PROD03 = "TRANZY_API_KEY_PROD03";
+    private const string TRANZY_API_KEY_1 = "TRANZY_API_KEY_1";
+    private const string TRANZY_API_KEY_2 = "TRANZY_API_KEY_2";
+    private const string TRANZY_API_KEY_3 = "TRANZY_API_KEY_3";
     private readonly IConfiguration _config;
     private readonly List<string> _apiKeys = new List<string>();
     private int _currentKeyIndex = 0;
@@ -20,13 +19,13 @@ public class TranzyApiKeyManager
     {
         if (IsDevelopment())
         {
-            _apiKeys.Add(_config[TRANZY_API_KEY_DEV01]);
+            _apiKeys.Add(_config[TRANZY_API_KEY_1]);
         }
         else
         {
-            _apiKeys.Add(_config[TRANZY_API_KEY_PROD01]);
-            _apiKeys.Add(_config[TRANZY_API_KEY_PROD02]);
-            _apiKeys.Add(_config[TRANZY_API_KEY_PROD03]);
+            _apiKeys.Add(_config[TRANZY_API_KEY_1]);
+            _apiKeys.Add(_config[TRANZY_API_KEY_2]);
+            _apiKeys.Add(_config[TRANZY_API_KEY_3]);
         }
         
     }
