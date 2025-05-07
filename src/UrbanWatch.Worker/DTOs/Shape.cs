@@ -2,7 +2,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 
-namespace UrbanWatch.Worker.Infrastructure.Mongo.Documents;
+namespace UrbanWatch.Worker.DTOs;
 
 public class Shape
 {

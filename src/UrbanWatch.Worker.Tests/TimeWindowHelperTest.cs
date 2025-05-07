@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using JetBrains.Annotations;
 using Moq;
+using UrbanWatch.Worker.Helpers;
 using UrbanWatch.Worker.Interfaces;
 using Xunit;
 

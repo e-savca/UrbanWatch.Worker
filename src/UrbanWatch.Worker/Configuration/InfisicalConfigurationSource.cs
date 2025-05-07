@@ -7,13 +7,13 @@ public class InfisicalConfigurationSource : IConfigurationSource
             token: Token, 
             workspaceId: WorkspaceId,
             environment: Environment,
-            folder: Folder,
+            tag: Tag,
             baseUrl: BaseUrl);
 
     public string Token       { get; init; }
     public string WorkspaceId { get; init; }
     public string Environment { get; init; }
-    public string Folder      { get; init; }
+    public string Tag      { get; init; }
     public string BaseUrl     { get; init; }
 }
 
@@ -23,16 +23,16 @@ public static class InfisicalConfigurationExtensions
         this IConfigurationBuilder builder,
         string token,
         string workspaceId,
+        string tag,
         string environment        = "prod",
-        string folder             = "/",
         string baseUrl            = "http://vault.home")
     {
         var src = new InfisicalConfigurationSource
         {
             Token       = token,
             WorkspaceId = workspaceId,
+            Tag      = tag,
             Environment = environment,
-            Folder      = folder,
             BaseUrl     = baseUrl
         };
         return builder.Add(src);

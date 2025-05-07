@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace UrbanWatch.Worker.Infrastructure.Mongo.Documents;
+namespace UrbanWatch.Worker.DTOs;
 
 public class Vehicle
 {

@@ -1,6 +1,6 @@
 using UrbanWatch.Worker.Interfaces;
 
-namespace UrbanWatch.Worker;
+namespace UrbanWatch.Worker.Helpers;
 
 public class TimeWindowHelper(IEnvManager envManager)
 {

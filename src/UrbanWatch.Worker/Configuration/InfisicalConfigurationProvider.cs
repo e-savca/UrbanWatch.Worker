@@ -13,20 +13,20 @@ public class InfisicalConfigurationProvider : ConfigurationProvider
     private readonly string _token;
     private readonly string _workspaceId;
     private readonly string _environment;
-    private readonly string _folder;
+    private readonly string _tag;
     private readonly string _baseUrl;
 
     public InfisicalConfigurationProvider(
         string token,
         string workspaceId,
         string environment,
-        string folder,
+        string tag,
         string baseUrl)
     {
         _token = token ?? throw new ArgumentNullException(nameof(token));
         _workspaceId = workspaceId ?? throw new ArgumentNullException(nameof(workspaceId));
         _environment = environment;
-        _folder = folder;
+        _tag = tag;
         _baseUrl = baseUrl.TrimEnd('/');
     }
 
@@ -34,8 +34,9 @@ public class InfisicalConfigurationProvider : ConfigurationProvider
     {
         var url = $"{_baseUrl}/api/v3/secrets/raw" +
                   $"?environment={Uri.EscapeDataString(_environment)}" +
+                  $"&recursive=true" +
                   $"&workspaceId={Uri.EscapeDataString(_workspaceId)}" +
-                  $"&path={Uri.EscapeDataString(_folder)}";
+                  $"&tagSlugs={Uri.EscapeDataString(_tag)}";
 
         for (int attempt = 1; attempt <= 3; attempt++)
         {
@@ -47,8 +48,6 @@ public class InfisicalConfigurationProvider : ConfigurationProvider
                 var resp = _httpClient.Send(req);
                 resp.EnsureSuccessStatusCode();
 
-                var body = resp.Content.ReadAsStringAsync();
-                
                 var responseBody = resp.Content.ReadAsStringAsync()
                     .GetAwaiter()
                     .GetResult();

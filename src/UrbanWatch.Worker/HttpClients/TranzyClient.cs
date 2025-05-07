@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using UrbanWatch.Worker.DTOs;
 using UrbanWatch.Worker.Interfaces;
 
-namespace UrbanWatch.Worker.Infrastructure.HttpClients;
+namespace UrbanWatch.Worker.HttpClients;
 
 public class TranzyClient(
     IEnvManager envManager,
