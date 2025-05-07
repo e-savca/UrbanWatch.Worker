@@ -1,6 +1,6 @@
 using System.Net;
 using Newtonsoft.Json;
-using UrbanWatch.Worker.Infrastructure.Mongo.Documents;
+using UrbanWatch.Worker.DTOs;
 using UrbanWatch.Worker.Interfaces;
 
 namespace UrbanWatch.Worker.Infrastructure.HttpClients;
