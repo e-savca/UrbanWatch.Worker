@@ -8,7 +8,8 @@
         "DOTNET_ENVIRONMENT": "Development",
         "INFISICAL_TOKEN": "",
         "INFISICAL_WORKSPACE_ID": "",
-        "INFISICAL_ENVIRONMENT": "prod",
+        "INFISICAL_TAG": "worker",
+        "INFISICAL_ENVIRONMENT": "dev",
         "INFISICAL_URL": "http://vault.home"
       }
     }

@@ -18,7 +18,8 @@ public class UrbanWatchClient(
     {
         try
         {
-            var response = await _httpClient.PostAsJsonAsync(_apiUrl, vehicles);
+            var vehiclesPostUrl = $"{_apiUrl}/map/Vehicles";
+            var response = await _httpClient.PostAsJsonAsync(vehiclesPostUrl, vehicles);
 
             if (response.IsSuccessStatusCode)
             {
