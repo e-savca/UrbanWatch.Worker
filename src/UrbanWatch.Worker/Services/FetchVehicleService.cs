@@ -56,15 +56,6 @@ public class FetchVehicleService(
         }
         
         logger.LogInformation("Pushed vehicles.");
-        
-        // var tasks = new[]
-        // {
-        //     // vehicleHistoryService.SaveBatchAsync(vehicles, stoppingToken),
-        //     // cacheService.CacheVehiclesAsync(vehicles)
-        // };
-        //
-        // await Task.WhenAll(tasks);
-
     }
     private bool CheckVehiclesForChanges(List<Vehicle> vehicles)
     {
