@@ -22,7 +22,7 @@ builder.Configuration.AddInfisical(
 
 builder.Services.AddHttpClient();
 builder.Services.AddHostedService<FetchVehiclesWorker>();
-// builder.Services.AddHostedService<CleanupVehiclesLive>();
+builder.Services.AddHostedService<CleanupVehiclesWorker>();
 // builder.Services.AddHostedService<PullTranzyData>();
 
 
@@ -35,6 +35,7 @@ builder.Services.AddSingleton<IEnvManager, EnvManager>();
 builder.Services.AddSingleton<TimeWindowHelper>();
 
 builder.Services.AddSingleton<FetchVehicleService>();
+builder.Services.AddSingleton<CleanupVehiclesService>();
 // builder.Services.AddSingleton<VehicleHistoryService>();
 
 var host = builder.Build();

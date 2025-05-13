@@ -47,7 +47,7 @@ public class FetchVehicleService(
         {
             AddOrUpdateVehiclesHash(vehicles);
             logger.LogInformation("Vehicle hashes updated.");
-            await urbanWatchClient.SendVehicles(snapshot);
+            await urbanWatchClient.SendVehiclesAsync(snapshot);
         }
         catch (Exception e)
         {
